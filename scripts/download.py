@@ -2,7 +2,9 @@
 # This program is free software under the GNU General Public License v3.
 # See <https://www.gnu.org/licenses/> for details.
 # Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
-
+"""
+Download STL models for RVIZ from Google Drive
+"""
 import os
 import sys
 
@@ -16,9 +18,11 @@ except ImportError:
     )
     sys.exit(1)
 
-BASE_DIR = "models"
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+RVIZ_DIR = os.path.dirname(SCRIPT_DIR)
+MODELS_DIR = os.path.join(RVIZ_DIR, "models")
 
-models = [
+MODELS = [
     {'id': "18fdSsnKvbXQLqfWb_mu2Q4eAavGvjkp5", 'name': "hany"},
     {'id': "1FlVgel2l5BrOxK1F-FImBssBnTdTcWQQ", 'name': "cyphaldrone"},
     {'id': "1lYfGu8VphDPBk_AMisGUksshFAxrHp6s", 'name': "vtol_2000"},
@@ -34,21 +38,25 @@ def download_model_from_google_drive(model_id, model_name, file_path):
 
     url = f"https://drive.google.com/uc?id={model_id}"
 
-    print(f"Downloading {model_name} model...")
+    print(f"Downloading {model_name} model to {file_path}...")
     try:
         gdown.download(url, file_path, quiet=False)
         print(f"Model {model_name} saved to {file_path}")
-    except Exception as e:
-        print(f"Failed to download {model_name}. Error: {e}")
+    except Exception as err:
+        print(f"Failed to download {model_name}. Error: {err}")
 
 
-os.makedirs(BASE_DIR, exist_ok=True)
-for model in models:
-    model_id = model['id']
-    model_name = model['name']
-    extension = model.get('extension', 'stl')
-    model_dir = os.path.join(BASE_DIR, model_name)
+def main():
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    for model in MODELS:
+        model_id = model['id']
+        model_name = model['name']
+        extension = model.get('extension', 'stl')
+        model_dir = os.path.join(MODELS_DIR, model_name)
 
-    os.makedirs(model_dir, exist_ok=True)
-    file_path = os.path.join(model_dir, f"vehicle.{extension}")
-    download_model_from_google_drive(model_id, model_name, file_path)
+        os.makedirs(model_dir, exist_ok=True)
+        file_path = os.path.join(model_dir, f"vehicle.{extension}")
+        download_model_from_google_drive(model_id, model_name, file_path)
+
+if __name__ == "__main__":
+    main()
